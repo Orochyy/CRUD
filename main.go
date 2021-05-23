@@ -9,9 +9,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var tmpl = template.Must(template.ParseGlob("form/*"))
+
 type Employee struct {
-	Id    int
-	Name  string
+	Id   int
+	Name string
 	City string
 }
 
@@ -26,9 +28,6 @@ func dbConn() (db *sql.DB) {
 	}
 	return db
 }
-
-var tmpl = template.Must(template.ParseGlob("form/*"))
-
 func Index(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	selDB, err := db.Query("SELECT * FROM Employee ORDER BY id DESC")
@@ -52,7 +51,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "Index", res)
 	defer db.Close()
 }
-
 func Show(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	nId := r.URL.Query().Get("id")
@@ -75,11 +73,9 @@ func Show(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "Show", emp)
 	defer db.Close()
 }
-
 func New(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "New", nil)
 }
-
 func Edit(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	nId := r.URL.Query().Get("id")
@@ -102,7 +98,6 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "Edit", emp)
 	defer db.Close()
 }
-
 func Insert(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	if r.Method == "POST" {
@@ -118,7 +113,6 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
-
 func Update(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	if r.Method == "POST" {
@@ -135,7 +129,6 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
-
 func Delete(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	emp := r.URL.Query().Get("id")
@@ -150,7 +143,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	log.Println("Server started on: http://localhost:8080")
+	log.Println("Server started on: http://localhost:8081")
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/show", Show)
 	http.HandleFunc("/new", New)
@@ -158,5 +151,5 @@ func main() {
 	http.HandleFunc("/insert", Insert)
 	http.HandleFunc("/update", Update)
 	http.HandleFunc("/delete", Delete)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8081", nil)
 }
